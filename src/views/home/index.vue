@@ -1,27 +1,30 @@
 <template>
   <el-container>
-    <el-aside width="200px">
+    <el-aside :style="{width:iscollapse?'65px':'200px'}">
       <el-menu
         background-color="#353B4E"
         text-color="#fff"
         active-text-color="#409eff"
+        :collapse="iscollapse"
+        :collapse-transition="false"
+        :width="iscollapse?'65px':'200px'"
       >
-        <el-menu-item index="1" style="width:200px">
+        <el-menu-item index="/welcome" :style="{width:iscollapse?'65px':'200px'}">
           <i class="el-icon-location"></i>
           <span slot="title">首页</span>
         </el-menu-item>
 
-        <el-submenu index="2" style="width:200px">
+        <el-submenu index="2" :style="{width:iscollapse?'65px':'200px'}">
           <template slot="title">
             <i class="el-icon-menu"></i>
             <span>内容管理</span>
           </template>
           <el-menu-item index="1-1">发布文章</el-menu-item>
-          <el-menu-item index="1-2">内容列表</el-menu-item>
+          <el-menu-item index="/article">内容列表</el-menu-item>
           <el-menu-item index="1-3">评论列表</el-menu-item>
           <el-menu-item index="1-4">素材管理</el-menu-item>
         </el-submenu>
-        <el-submenu index="3" style="width:200px">
+        <el-submenu index="3" :style="{width:iscollapse?'65px':'200px'}">
           <template slot="title">
             <i class="el-icon-document"></i>
             <span>粉丝管理</span>
@@ -31,7 +34,7 @@
           <el-menu-item index="3-3">粉丝画像</el-menu-item>
           <el-menu-item index="3-4">粉丝列表</el-menu-item>
         </el-submenu>
-        <el-menu-item index="4" style="width:200px">
+        <el-menu-item index="4" :style="{width:iscollapse?'65px':'200px'}">
           <i class="el-icon-setting"></i>
           <span slot="title">账户信息</span>
         </el-menu-item>
@@ -40,7 +43,7 @@
     <el-container>
       <el-header>
         <div class="lt">
-          <i class="el-icon-s-unfold"></i>
+          <i :class="iscollapse? 'el-icon-s-unfold':'el-icon-s-fold'" @click="iscollapse=!iscollapse"></i>
           <span>江苏传智播客教育科技股份有限公司</span>
         </div>
         <div class="rt">
@@ -57,7 +60,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>个人信息</el-dropdown-item>
               <el-dropdown-item>git地址</el-dropdown-item>
-              <el-dropdown-item>退出</el-dropdown-item>
+              <el-dropdown-item @click.native="logout()">退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -73,7 +76,8 @@
 export default {
   data () {
     return {
-      search: ''
+      search: '',
+      iscollapse: false
     }
   },
   computed: {
@@ -83,6 +87,26 @@ export default {
     photo: function () {
       return JSON.parse(window.sessionStorage.getItem('userInfo')).photo
     }
+  },
+  methods: {
+    logout () {
+      this.$confirm('是否确认退出系统?', '退出', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        window.sessionStorage.removeItem('userInfo')
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    }
   }
 }
 </script>
@@ -90,12 +114,10 @@ export default {
 <style lang="less" scoped>
 .el-container {
   height: 100%;
-  background-color: #ccc;
   .el-aside {
     background-color: #323745;
   }
   .el-header {
-    background-color: #fff;
     display: flex;
     justify-content: space-between;
     .lt {
@@ -124,6 +146,7 @@ export default {
         .avatar{
           width:35px;
           height:35px;
+          margin-right: 10px;
           border-radius:50%;
           vertical-align: middle;
         }
@@ -136,7 +159,7 @@ export default {
     }
   }
   .el-main {
-    // background-color: #fff;
+    background-color: #ccc;
   }
 }
 </style>
