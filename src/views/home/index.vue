@@ -39,15 +39,19 @@
     </el-aside>
     <el-container>
       <el-header>
-        <div class="lt"></div>
+        <div class="lt">
+          <i class="el-icon-s-unfold"></i>
+          <span>江苏传智播客教育科技股份有限公司</span>
+        </div>
         <div class="rt">
-          <el-input placeholder="请输入搜索文章内容">
+          <el-input placeholder="请输入搜索文章内容" type="text" v-model="search">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <span>消息</span>
-          <el-dropdown-menu>
+          <span class="msg">消息</span>
+          <el-dropdown>
             <span class="el-dropdown-link">
-              下拉菜单
+              <img :src="photo" alt="" class="avatar">
+              {{name}}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
@@ -55,7 +59,7 @@
               <el-dropdown-item>git地址</el-dropdown-item>
               <el-dropdown-item>退出</el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </el-header>
       <el-main>
@@ -66,41 +70,73 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data () {
+    return {
+      search: ''
+    }
+  },
+  computed: {
+    name: function () {
+      return JSON.parse(window.sessionStorage.getItem('userInfo')).name
+    },
+    photo: function () {
+      return JSON.parse(window.sessionStorage.getItem('userInfo')).photo
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
 .el-container {
-  background-color: gray;
   height: 100%;
+  background-color: #ccc;
   .el-aside {
     background-color: #323745;
   }
   .el-header {
-    background-color: lightgray;
+    background-color: #fff;
     display: flex;
     justify-content: space-between;
     .lt {
       width: 40%;
-      background-color: skyblue;
+      display: flex;
+      align-items:center;
+      font-size: 20px;
+      i{
+        margin-right: 10px;
+        font-size: 25px;
+      }
     }
     .rt {
       width: 60%;
-      background-color: lightgreen;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       .el-input {
         width: 180px;
+        // height: 32px;
       }
-      .el-dropdown-menu{
+      .msg{
+        margin: 0 10px 0 20px
+      }
+      .el-dropdown{
+        .avatar{
+          width:35px;
+          height:35px;
+          border-radius:50%;
+          vertical-align: middle;
+        }
+        .el-dropdown-menu{
         display: flex;
         align-items: center;
       }
+      }
+
     }
   }
   .el-main {
-    background-color: #fff;
+    // background-color: #fff;
   }
 }
 </style>
