@@ -4,27 +4,34 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [{
-    path: '/login',
-    name: 'login',
-    component: () =>
+  path: '/login',
+  name: 'login',
+  component: () =>
         import ('@/views/login')
 }, {
-    path: '/home',
-    name: 'home',
+  path: '/home',
+  name: 'home',
+  component: () =>
+        import ('@/views/home'),
+  children: [{
+
+    path: '/article',
+    name: 'article',
     component: () =>
-        import ('@/views/home')
+            import ('@/views/article')
+  }]
 }]
 
 const router = new VueRouter({
-    routes
+  routes
 })
 
 router.beforeEach((to, from, next) => {
-    let userInfo = window.sessionStorage.getItem('userInfo')
-    if (!userInfo && to.path !== '/login') {
-        return next('/login')
-    }
-    next()
+  let userInfo = window.sessionStorage.getItem('userInfo')
+  if (!userInfo && to.path !== '/login') {
+    return next('/login')
+  }
+  next()
 })
 
 export default router

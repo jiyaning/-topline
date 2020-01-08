@@ -2,12 +2,16 @@
   <div class="login-container">
     <div class="login-box">
       <el-form ref="formref" :model="loginForm" :rules="formrules">
-        <img src="./logo_index.png" alt="">
+        <img src="./logo_index.png" alt />
         <el-form-item prop="mobile">
-          <el-input v-model="loginForm.mobile" placeholder="请输入手机号"></el-input>
+          <el-input v-model="loginForm.mobile" placeholder="请输入手机号">
+            <i slot="prefix" class="iconfont icon-shoujihao"></i>
+          </el-input>
         </el-form-item>
         <el-form-item prop="code">
-          <el-input v-model="loginForm.code" placeholder="验证码"></el-input>
+          <el-input v-model="loginForm.code" placeholder="验证码">
+            <i slot="prefix" class="iconfont icon-yanzhengma"></i>
+          </el-input>
         </el-form-item>
         <el-form-item style="text-align:left" prop="xieyi">
           <el-checkbox v-model="loginForm.xieyi" style="margin-right:10px"></el-checkbox>
@@ -18,7 +22,13 @@
           </span>
         </el-form-item>
         <el-form-item>
-          <el-button style="width:100%" type="primary" @click="login()">登录</el-button>
+          <el-button
+            style="width:100%"
+            type="primary"
+            @click="login()"
+            :disabled="isLoading"
+            :loading="isLoading"
+          >登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -27,12 +37,15 @@
 
 <script>
 import './gt.js'
+import '../../assets/iconfont/iconfont.css'
 export default {
   data () {
     var xieyiTest = function (rule, value, callback) {
       value ? callback() : callback(new Error('请遵守协议'))
     }
     return {
+      capobj: null,
+      isLoading: false,
       loginForm: {
         mobile: '',
         code: '',
@@ -43,12 +56,8 @@ export default {
           { required: true, message: '手机号码必须填写' },
           { pattern: /^1[35789]\d{9}$/, message: '手机号码格式不对' }
         ],
-        code: [
-          { required: true, message: '验证码必须填写' }
-        ],
-        xieyi: [
-          { validator: xieyiTest }
-        ]
+        code: [{ required: true, message: '验证码必须填写' }],
+        xieyi: [{ validator: xieyiTest }]
       }
     }
   },
@@ -59,33 +68,45 @@ export default {
         if (!valid) {
           return false
         }
+        if (this.capobj) {
+          return this.capobj.verify()
+        }
+        this.isLoading = true
         let pro = this.$http({
           url: '/mp/v1_0/captchas/' + this.loginForm.mobile,
           method: 'GET'
         })
         pro
           .then(result => {
-            let{ data } = result.data
-            window.initGeetest({
-              // 以下配置参数来自服务端 SDK
-              gt: data.gt,
-              challenge: data.challenge,
-              offline: !data.success,
-              new_captcha: true,
-              product: 'bind' // 设置验证窗口样式的
-            }, captchaObj => {
-              // 这里可以调用验证实例 captchaObj 的实例方法
-              captchaObj.onReady(() => {
-                // 验证码ready之后才能调用verify方法显示验证码(可以显示窗口了)
-                captchaObj.verify() // 显示验证码窗口
-              }).onSuccess(() => {
-                // 行为校验正确的处理
-                // B. 验证账号，登录系统
-                this.loginAct()
-              }).onError(() => {
-                // 行为校验错误的处理
-              })
-            })
+            let { data } = result.data
+            window.initGeetest(
+              {
+                // 以下配置参数来自服务端 SDK
+                gt: data.gt,
+                challenge: data.challenge,
+                offline: !data.success,
+                new_captcha: true,
+                product: 'bind' // 设置验证窗口样式的
+              },
+              captchaObj => {
+                // 这里可以调用验证实例 captchaObj 的实例方法
+                captchaObj
+                  .onReady(() => {
+                    // 验证码ready之后才能调用verify方法显示验证码(可以显示窗口了)
+                    captchaObj.verify() // 显示验证码窗口
+                    this.isLoading = false
+                    this.capobj = captchaObj
+                  })
+                  .onSuccess(() => {
+                    // 行为校验正确的处理
+                    // B. 验证账号，登录系统
+                    this.loginAct()
+                  })
+                  .onError(() => {
+                    // 行为校验错误的处理
+                  })
+              }
+            )
           })
           .catch(err => {
             this.$message.error('获取秘钥失败' + err)
@@ -100,7 +121,10 @@ export default {
       })
       pro
         .then(result => {
-          window.sessionStorage.setItem('userInfo', JSON.stringify(result.data.data))
+          window.sessionStorage.setItem(
+            'userInfo',
+            JSON.stringify(result.data.data)
+          )
           this.$router.push({ name: 'home' })
         })
         .catch(err => {
@@ -117,7 +141,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-a{
+a {
   text-decoration: none;
 }
 .login-container {
@@ -138,7 +162,7 @@ a{
     .el-form {
       width: 75%;
       text-align: center;
-      img{
+      img {
         width: 60%;
         margin: 20px auto;
       }
