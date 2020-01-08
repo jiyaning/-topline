@@ -8,6 +8,7 @@
         :collapse="iscollapse"
         :collapse-transition="false"
         :width="iscollapse?'65px':'200px'"
+        router
       >
         <el-menu-item index="/welcome" :style="{width:iscollapse?'65px':'200px'}">
           <i class="el-icon-location"></i>
@@ -74,6 +75,7 @@
 
 <script>
 export default {
+  name: 'Home',
   data () {
     return {
       search: '',
@@ -96,15 +98,13 @@ export default {
         type: 'warning'
       }).then(() => {
         window.sessionStorage.removeItem('userInfo')
+        this.$router.push('/login')
         this.$message({
           type: 'success',
-          message: '删除成功!'
+          duration: 500,
+          message: '退出系统!'
         })
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
       })
     }
   }

@@ -39,6 +39,7 @@
 import './gt.js'
 import '../../assets/iconfont/iconfont.css'
 export default {
+  name: 'Login',
   data () {
     var xieyiTest = function (rule, value, callback) {
       value ? callback() : callback(new Error('请遵守协议'))
