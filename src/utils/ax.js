@@ -1,5 +1,6 @@
 import axios from 'axios'
 import Vue from 'vue'
+import router from '@/router'
 // 配置公共根地址(线上地址)
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/'
 // 配置为Vue的继承成员
@@ -22,10 +23,13 @@ axios.interceptors.request.use(function (config) {
 
 // 配置响应拦截器
 axios.interceptors.response.use(function (response) {
-  // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
   return response
 }, function (error) {
+  if (error.response.status === 401) {
+    router.push('/login')
+    return new Promise(function () {})
+  }
   // Any status codes that falls outside the range of 2xx cause this function to trigger
   // Do something with response error
   return Promise.reject(error)

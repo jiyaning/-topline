@@ -12,6 +12,7 @@
             <el-radio v-model="articleForm.status" label="1">待审核</el-radio>
             <el-radio v-model="articleForm.status" label="2">审核通过</el-radio>
             <el-radio v-model="articleForm.status" label="3">审核失败</el-radio>
+             <el-radio v-model="articleForm.status" label="4">已删除</el-radio>
           </el-form-item>
           <el-form-item label="频道列表">
             <el-select v-model="articleForm.channel_id" placeholder="请选择" clearable>
@@ -57,6 +58,7 @@
             <el-tag type="info" v-else-if="stData.row.status===1">待审核</el-tag>
             <el-tag type="success" v-else-if="stData.row.status===2">审核通过</el-tag>
             <el-tag type="danger" v-else-if="stData.row.status===3">审核失败</el-tag>
+            <el-tag type="danger" v-else-if="stData.row.status===4">已删除</el-tag>
           </template>
         </el-table-column>
 
