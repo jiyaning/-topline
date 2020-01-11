@@ -24,6 +24,26 @@ const routes = [{
     name: 'welcome',
     component: () =>
             import ('@/views/welcome')
+  }, {
+    path: '/account',
+    name: 'account',
+    component: () =>
+            import ('@/views/account')
+  }, {
+    path: '/articleadd',
+    name: 'articleadd',
+    component: () =>
+            import ('@/views/articleadd')
+  }, {
+    path: '/comment',
+    name: 'comment',
+    component: () =>
+            import ('@/views/comment')
+  }, {
+    path: '/material',
+    name: 'material',
+    component: () =>
+            import ('@/views/material')
   }]
 }]
 

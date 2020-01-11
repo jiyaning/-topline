@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '@/router'
+import JSONbig from 'json-bigint'
 // 配置公共根地址(线上地址)
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/'
 // 配置为Vue的继承成员
@@ -20,7 +21,6 @@ axios.interceptors.request.use(function (config) {
 }, function (error) {
   return Promise.reject(error)
 })
-
 // 配置响应拦截器
 axios.interceptors.response.use(function (response) {
   // Do something with response data
@@ -34,3 +34,10 @@ axios.interceptors.response.use(function (response) {
   // Do something with response error
   return Promise.reject(error)
 })
+// 服务器端返回，数据转换器，应用
+axios.defaults.transformResponse = [function (data) {
+  if (data) {
+    return JSONbig.parse(data)
+  }
+  return data
+}]

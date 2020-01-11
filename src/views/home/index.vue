@@ -20,10 +20,10 @@
             <i class="el-icon-menu"></i>
             <span>内容管理</span>
           </template>
-          <el-menu-item index="1-1">发布文章</el-menu-item>
+          <el-menu-item index="/articleadd">发布文章</el-menu-item>
           <el-menu-item index="/article">内容列表</el-menu-item>
-          <el-menu-item index="1-3">评论列表</el-menu-item>
-          <el-menu-item index="1-4">素材管理</el-menu-item>
+          <el-menu-item index="/comment">评论列表</el-menu-item>
+          <el-menu-item index="/material">素材管理</el-menu-item>
         </el-submenu>
         <el-submenu index="3" :style="{width:iscollapse?'65px':'200px'}">
           <template slot="title">
@@ -35,7 +35,7 @@
           <el-menu-item index="3-3">粉丝画像</el-menu-item>
           <el-menu-item index="3-4">粉丝列表</el-menu-item>
         </el-submenu>
-        <el-menu-item index="4" :style="{width:iscollapse?'65px':'200px'}">
+        <el-menu-item index="/account" :style="{width:iscollapse?'65px':'200px'}">
           <i class="el-icon-setting"></i>
           <span slot="title">账户信息</span>
         </el-menu-item>
@@ -159,7 +159,8 @@ export default {
     }
   }
   .el-main {
-    background-color: #ccc;
+    background-color: #ececec;
+    padding: 8px;
   }
 }
 </style>
