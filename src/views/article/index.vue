@@ -7,12 +7,12 @@
       <div class="text item">
         <el-form ref="articleFormRef" :model="articleForm" label-width="110px">
           <el-form-item label="文章状态">
-            <el-radio v-model="articleForm.status" label="">全部</el-radio>
+            <el-radio v-model="articleForm.status" label>全部</el-radio>
             <el-radio v-model="articleForm.status" label="0">草稿</el-radio>
             <el-radio v-model="articleForm.status" label="1">待审核</el-radio>
             <el-radio v-model="articleForm.status" label="2">审核通过</el-radio>
             <el-radio v-model="articleForm.status" label="3">审核失败</el-radio>
-             <el-radio v-model="articleForm.status" label="4">已删除</el-radio>
+            <el-radio v-model="articleForm.status" label="4">已删除</el-radio>
           </el-form-item>
           <el-form-item label="频道列表">
             <el-select v-model="articleForm.channel_id" placeholder="请选择" clearable>
@@ -52,7 +52,7 @@
         </el-table-column>
         <el-table-column prop="title" label="标题"></el-table-column>
 
-        <el-table-column  label="状态">
+        <el-table-column label="状态">
           <template slot-scope="stData">
             <el-tag type="warning" v-if="stData.row.status===0">草稿</el-tag>
             <el-tag type="info" v-else-if="stData.row.status===1">待审核</el-tag>
@@ -64,8 +64,11 @@
 
         <el-table-column prop="pubdate" label="发布时间"></el-table-column>
         <el-table-column label="操作">
-          <el-button type="primary" icon="el-icon-edit" size="mini">修改</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+          <template slot-scope="stData">
+            <el-button type="primary" icon="el-icon-edit" size="mini">修改</el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="articleDel(stData.row.id)"
+            >删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <el-pagination
@@ -129,6 +132,38 @@ export default {
     // 当前页变动时候触发的事件
     handleCurrentChange (val) {
       this.articleForm.page = val
+    },
+    articleDel (aid) {
+      this.$confirm('是否删除该文章', '删除', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          let pro = this.$http({
+            url: '/mp/v1_0/articles/' + aid,
+            method: 'delete'
+          })
+          pro
+            .then(result => {
+              this.$message({
+                type: 'success',
+                duration: 1000,
+                message: '删除成功!'
+              })
+              this.getArticleList()
+            })
+            .catch(err => {
+              this.$message.error('删除文章错误' + err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            duration: 1000,
+            message: '已取消删除'
+          })
+        })
     },
     getchannelList () {
       let pro = this.$http({

@@ -48,8 +48,8 @@ export default {
       capobj: null,
       isLoading: false,
       loginForm: {
-        mobile: '',
-        code: '',
+        mobile: '13037651017',
+        code: '246810',
         xieyi: false
       },
       formrules: {
