@@ -19,12 +19,12 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="频道:" prop="channel_id">
-        <channel @slt="selectHander"></channel>
+        <channel @slt="selectHander" :chid="articleForm.channel_id"></channel>
       </el-form-item>
       <el-divider></el-divider>
       <el-form-item>
-        <el-button type="primary" @click="articleAdd(false)">发表</el-button>
-        <el-button @click="articleAdd(true)">存入草稿</el-button>
+        <el-button type="primary" @click="articleedit(false)">发表</el-button>
+        <el-button @click="articleedit(true)">存入草稿</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -34,13 +34,17 @@
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import Channel from '@/components/channel.vue'
+
 import { quillEditor } from 'vue-quill-editor'
+import Channel from '@/components/channel.vue'
 export default {
   name: 'articleadd',
   components: {
     quillEditor,
     Channel
+  },
+  created () {
+    this.getarticleByid()
   },
   data () {
     return {
@@ -68,18 +72,37 @@ export default {
       }
     }
   },
+  computed: {
+    aid () {
+      return this.$route.params.aid
+    }
+  },
   methods: {
     selectHander (val) {
       this.articleForm.channel_id = val
     },
-    articleAdd (flag) {
+    getarticleByid () {
+      let pro = this.$http({
+        url: '/mp/v1_0/articles/' + this.aid,
+        method: 'GET'
+      })
+      pro
+        .then(result => {
+          console.log(result)
+          this.articleForm = result.data.data
+        })
+        .catch(err => {
+          return this.$message.error('获取文章失败' + err)
+        })
+    },
+    articleedit (flag) {
       this.$refs.articleFormRef.validate((valid) => {
         if (!valid) {
           return false
         }
         let pro = this.$http({
-          url: '/mp/v1_0/articles',
-          method: 'post',
+          url: '/mp/v1_0/articles/' + this.aid,
+          method: 'put',
           data: this.articleForm,
           params: { draft: flag }
         })

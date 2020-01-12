@@ -44,7 +44,10 @@
     <el-container>
       <el-header>
         <div class="lt">
-          <i :class="iscollapse? 'el-icon-s-unfold':'el-icon-s-fold'" @click="iscollapse=!iscollapse"></i>
+          <i
+            :class="iscollapse? 'el-icon-s-unfold':'el-icon-s-fold'"
+            @click="iscollapse=!iscollapse"
+          ></i>
           <span>江苏传智播客教育科技股份有限公司</span>
         </div>
         <div class="rt">
@@ -54,7 +57,7 @@
           <span class="msg">消息</span>
           <el-dropdown>
             <span class="el-dropdown-link">
-              <img :src="photo" alt="" class="avatar">
+              <img :src="photo" alt class="avatar" />
               {{name}}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
@@ -74,21 +77,39 @@
 </template>
 
 <script>
+import bus from '@/utils/bus.js'
+
 export default {
   name: 'Home',
   data () {
     return {
+      tmpname: '',
+      tmpphoto: '',
       search: '',
       iscollapse: false
     }
   },
   computed: {
     name: function () {
-      return JSON.parse(window.sessionStorage.getItem('userInfo')).name
+      return this.tmpname || JSON.parse(window.sessionStorage.getItem('userInfo')).name
     },
     photo: function () {
-      return JSON.parse(window.sessionStorage.getItem('userInfo')).photo
+      return this.tmpphoto || JSON.parse(window.sessionStorage.getItem('userInfo')).photo
     }
+  },
+  created () {
+    bus.$on('upAccountName', nm => {
+      let userinfo = JSON.parse(window.sessionStorage.getItem('userInfo'))
+      userinfo.name = nm
+      window.sessionStorage.setItem('userInfo', JSON.stringify(userinfo))
+      this.tmpname = nm
+    })
+    bus.$on('upAccountPhoto', ph => {
+      let userinfo = JSON.parse(window.sessionStorage.getItem('userInfo'))
+      userinfo.photo = ph
+      window.sessionStorage.setItem('userInfo', JSON.stringify(userinfo))
+      this.tmpphoto = ph
+    })
   },
   methods: {
     logout () {
@@ -123,9 +144,9 @@ export default {
     .lt {
       width: 40%;
       display: flex;
-      align-items:center;
+      align-items: center;
       font-size: 20px;
-      i{
+      i {
         margin-right: 10px;
         font-size: 25px;
       }
@@ -139,23 +160,22 @@ export default {
         width: 180px;
         // height: 32px;
       }
-      .msg{
-        margin: 0 10px 0 20px
+      .msg {
+        margin: 0 10px 0 20px;
       }
-      .el-dropdown{
-        .avatar{
-          width:35px;
-          height:35px;
+      .el-dropdown {
+        .avatar {
+          width: 35px;
+          height: 35px;
           margin-right: 10px;
-          border-radius:50%;
+          border-radius: 50%;
           vertical-align: middle;
         }
-        .el-dropdown-menu{
-        display: flex;
-        align-items: center;
+        .el-dropdown-menu {
+          display: flex;
+          align-items: center;
+        }
       }
-      }
-
     }
   }
   .el-main {

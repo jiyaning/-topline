@@ -15,14 +15,7 @@
             <el-radio v-model="articleForm.status" label="4">已删除</el-radio>
           </el-form-item>
           <el-form-item label="频道列表">
-            <el-select v-model="articleForm.channel_id" placeholder="请选择" clearable>
-              <el-option
-                v-for="item in channelList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+            <channel @slt="selectHander"></channel>
           </el-form-item>
           <el-form-item label="时间选择">
             <el-date-picker
@@ -65,7 +58,8 @@
         <el-table-column prop="pubdate" label="发布时间"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="stData">
-            <el-button type="primary" icon="el-icon-edit" size="mini">修改</el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini"
+            @click="$router.push(`./articleedit/${stData.row.id}`)">修改</el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="articleDel(stData.row.id)"
             >删除</el-button>
           </template>
@@ -85,17 +79,19 @@
 </template>
 
 <script>
+import Channel from '@/components/channel.vue'
 export default {
   name: 'Article',
+  components: {
+    Channel
+  },
   created () {
-    this.getchannelList()
     this.getArticleList()
   },
   data () {
     return {
       timetotime: [],
       total: 0,
-      channelList: [],
       articleList: [],
       articleForm: {
         page: 1,
@@ -125,6 +121,9 @@ export default {
     }
   },
   methods: {
+    selectHander (val) {
+      this.articleForm.channel_id = val
+    },
     // 页码大小变动时候触发的事件
     handleSizeChange (val) {
       this.articleForm.per_page = val
@@ -133,6 +132,7 @@ export default {
     handleCurrentChange (val) {
       this.articleForm.page = val
     },
+    // 删除文章
     articleDel (aid) {
       this.$confirm('是否删除该文章', '删除', {
         confirmButtonText: '确定',
@@ -165,21 +165,9 @@ export default {
           })
         })
     },
-    getchannelList () {
-      let pro = this.$http({
-        url: '/mp/v1_0/channels',
-        method: 'GET'
-      })
-      pro
-        .then(result => {
-          this.channelList = result.data.data.channels
-        })
-        .catch(err => {
-          return this.$message.error('获取列表频道失败' + err)
-        })
-    },
     getArticleList () {
       let articleForm = {}
+      // 把searchForm内部为空的成员都"过滤掉"
       for (var i in this.articleForm) {
         if (this.articleForm[i] || this.articleForm[i] === 0) {
           articleForm[i] = this.articleForm[i]

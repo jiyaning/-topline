@@ -6,7 +6,16 @@
     <div class="text item">
       <div class="avatarbox">
         <el-avatar :size="55" :src="infoForm.photo"></el-avatar>
-        <el-link type="primary" :underline="false" @click.native="editavatar()">更换头像</el-link>
+        <el-link type="primary" :underline="false">更换头像</el-link>
+        <!-- <el-upload
+          class="avatar-uploader"
+          action=""
+          :show-file-list="false"
+          :http-request="editavatar()"
+        >
+          <img v-if="imageUrl" :src="infoForm.photo" class="avatar" />
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>-->
       </div>
       <div class="usercon" v-show="edittag===false">
         <div class="lt">
@@ -14,7 +23,7 @@
           <p>{{infoForm.intro}}</p>
         </div>
         <div class="rt">
-          <el-link type="primary" :underline="false" @click.native="editinfo()">修改</el-link>
+          <el-link type="primary" :underline="false" @click.native="edittag = true">修改</el-link>
         </div>
       </div>
       <el-form ref="infoFormRef" :model="infoForm" label-width="110px" v-show="edittag===true">
@@ -24,8 +33,13 @@
         <el-form-item label="简介">
           <el-input v-model="infoForm.intro" placeholder="请输入头条号简介"></el-input>
         </el-form-item>
-        <el-button type="primary" size="mini" style="margin-left:110px" @click.native="save()">保存</el-button>
-        <el-button size="mini" @click.native="cancel()">取消</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          style="margin-left:110px"
+          @click.native="infoEdit()"
+        >保存</el-button>
+        <el-button size="mini" @click.native="edittag = false">取消</el-button>
       </el-form>
     </div>
     <el-divider></el-divider>
@@ -58,24 +72,31 @@
       </div>
       <div class="usercon" v-show="editEmail===false">
         <div class="lt">
-          <p>{{infoForm.email}}</p>
+          <p v-if="infoForm.email===null">暂无绑定邮箱</p>
+          <p v-else>{{infoForm.email}}</p>
         </div>
         <div class="rt">
-          <el-link type="primary" :underline="false" @click.native="editemail()">修改邮箱</el-link>
+          <el-link type="primary" :underline="false" @click.native="editEmail = true">修改邮箱</el-link>
         </div>
       </div>
-      <el-form ref="infoListRef" :model="infoForm" label-width="110px" v-show="editEmail===true">
+      <el-form ref="infoFormRef" :model="infoForm" label-width="110px" v-show="editEmail===true">
         <el-form-item label="邮箱">
           <el-input v-model="infoForm.email" placeholder="请输入邮箱地址"></el-input>
         </el-form-item>
-        <el-button type="primary" size="mini" style="margin-left:110px" @click.native="saveEmail()">保存</el-button>
-        <el-button size="mini" @click.native="cancelEmail()">取消</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          style="margin-left:110px"
+          @click.native="infoEdit()"
+        >保存</el-button>
+        <el-button size="mini" @click.native="editEmail = false">取消</el-button>
       </el-form>
     </div>
   </el-card>
 </template>
 
 <script>
+import bus from '@/utils/bus.js'
 export default {
   created () {
     this.getuserInfo()
@@ -95,67 +116,45 @@ export default {
     }
   },
   methods: {
-    editemail () {
-      this.editEmail = true
-    },
-    editavatar () {
-      const h = this.$createElement
-      this.$msgbox({
-        title: '上传头像',
-        message: h('p', null, [
-          h('span', null, '内容可以是 '),
-          h('i', { style: 'color: teal' }, 'VNode')
-        ]),
-        showCancelButton: true,
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        beforeClose: (action, instance, done) => {
-          if (action === 'confirm') {
-            instance.confirmButtonLoading = true
-            instance.confirmButtonText = '执行中...'
-            setTimeout(() => {
-              done()
-              setTimeout(() => {
-                instance.confirmButtonLoading = false
-              }, 300)
-            }, 3000)
-          } else {
-            done()
-          }
-        }
-      }).then(action => {
-        this.$message({
-          type: 'info',
-          message: 'action: ' + action
-        })
+    // 更换头像
+    editavatar (resourse) {
+      let pic = resourse.file
+      let fd = new FormData()
+      fd.append('photo', pic)
+      let pro = this.$http({
+        url: '/mp/v1_0/user/photo',
+        method: 'patch',
+        data: fd
       })
+      pro.then(result => {
+        this.$message.success('上传图片成功')
+      })
+        .catch(err => {
+          this.$message.error('上传图片错误' + err)
+        })
     },
-    editinfo () {
-      this.edittag = true
-    },
-    cancelEmail () {
-      this.editEmail = false
-    },
-    saveEmail () {
-      this.editEmail = true
-    },
-    cancel () {
-      this.edittag = false
-    },
-    save () {
+    // 修改用户信息
+    infoEdit () {
       let pro = this.$http({
         url: '/mp/v1_0/user/profile',
-        method: 'PATCH',
+        method: 'patch',
         data: this.infoForm
       })
       pro
         .then(result => {
-          console.log(result)
+          this.$message({
+            type: 'success',
+            message: '修改成功!',
+            duration: 1000
+          })
+          this.edittag = false
+          bus.$emit('upAccountName', this.infoForm.name)
         })
         .catch(err => {
           this.$message.error('保存用户信息错误' + err)
         })
     },
+    // 获取用户信息
     getuserInfo () {
       let pro = this.$http({
         url: '/mp/v1_0/user/profile',

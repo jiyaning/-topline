@@ -44,6 +44,11 @@ const routes = [{
     name: 'material',
     component: () =>
             import ('@/views/material')
+  }, {
+    path: '/articleedit/:aid',
+    name: 'articleedit',
+    component: () =>
+            import ('@/views/articleedit')
   }]
 }]
 
