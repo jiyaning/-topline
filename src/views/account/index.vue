@@ -5,17 +5,20 @@
     </div>
     <div class="text item">
       <div class="avatarbox">
-        <el-avatar :size="55" :src="infoForm.photo"></el-avatar>
-        <el-link type="primary" :underline="false">更换头像</el-link>
-        <!-- <el-upload
+        <el-upload
           class="avatar-uploader"
-          action=""
+          action
           :show-file-list="false"
-          :http-request="editavatar()"
+          :http-request="editavatar"
         >
-          <img v-if="imageUrl" :src="infoForm.photo" class="avatar" />
+          <img
+            v-if="infoForm.photo"
+            :src="infoForm.photo"
+            class="avatar"
+            style="width:80px;height:80px;border-radius:50%"
+          />
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>-->
+        </el-upload>
       </div>
       <div class="usercon" v-show="edittag===false">
         <div class="lt">
@@ -26,8 +29,14 @@
           <el-link type="primary" :underline="false" @click.native="edittag = true">修改</el-link>
         </div>
       </div>
-      <el-form ref="infoFormRef" :model="infoForm" label-width="110px" v-show="edittag===true">
-        <el-form-item label="名称">
+      <el-form
+        ref="infoFormRef"
+        :rules="accountrules"
+        :model="infoForm"
+        label-width="110px"
+        v-show="edittag===true"
+      >
+        <el-form-item label="名称" prop="name">
           <el-input v-model="infoForm.name" placeholder="请输入头条号名称"></el-input>
         </el-form-item>
         <el-form-item label="简介">
@@ -79,8 +88,14 @@
           <el-link type="primary" :underline="false" @click.native="editEmail = true">修改邮箱</el-link>
         </div>
       </div>
-      <el-form ref="infoFormRef" :model="infoForm" label-width="110px" v-show="editEmail===true">
-        <el-form-item label="邮箱">
+      <el-form
+        ref="infoFormRef"
+        :rules="accountrules"
+        :model="infoForm"
+        label-width="110px"
+        v-show="editEmail===true"
+      >
+        <el-form-item label="邮箱" prop="email">
           <el-input v-model="infoForm.email" placeholder="请输入邮箱地址"></el-input>
         </el-form-item>
         <el-button
@@ -112,6 +127,16 @@ export default {
         mobile: '',
         name: '',
         photo: ''
+      },
+      accountrules: {
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' },
+          { min: 1, max: 7, message: '长度在 1到 7 个字符', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入名称', trigger: 'blur' },
+          { type: 'email', message: '邮箱格式不正确' }
+        ]
       }
     }
   },
@@ -127,32 +152,42 @@ export default {
         data: fd
       })
       pro.then(result => {
-        this.$message.success('上传图片成功')
+        console.log(result)
+        this.infoForm.photo = result.data.data.photo
+        this.$message.success('更新头像成功')
+        bus.$emit('upAccountPhoto', result.data.data.photo)
       })
         .catch(err => {
-          this.$message.error('上传图片错误' + err)
+          this.$message.error('上传头像错误' + err)
         })
     },
     // 修改用户信息
     infoEdit () {
-      let pro = this.$http({
-        url: '/mp/v1_0/user/profile',
-        method: 'patch',
-        data: this.infoForm
-      })
-      pro
-        .then(result => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!',
-            duration: 1000
+      this.$refs.infoFormRef.validate(valid => {
+        if (!valid) {
+          alert(111)
+          return false
+        }
+        let pro = this.$http({
+          url: '/mp/v1_0/user/profile',
+          method: 'patch',
+          data: this.infoForm
+        })
+        pro
+          .then(result => {
+            this.$message({
+              type: 'success',
+              message: '修改成功!',
+              duration: 1000
+            })
+            this.edittag = false
+            this.editEmail = false
+            bus.$emit('upAccountName', this.infoForm.name)
           })
-          this.edittag = false
-          bus.$emit('upAccountName', this.infoForm.name)
-        })
-        .catch(err => {
-          this.$message.error('保存用户信息错误' + err)
-        })
+          .catch(err => {
+            this.$message.error('保存用户信息错误' + err)
+          })
+      })
     },
     // 获取用户信息
     getuserInfo () {
