@@ -33,25 +33,28 @@
         <el-button @click="articleAdd(true)">存入草稿</el-button>
       </el-form-item>
     </el-form>
-    <el-dialog
-  title="素材库"
-  :visible.sync="dialogVisible"
-  width="70%"
-  >
-  <ul class="imglist">
-        <li class="imgbox" v-for="item in imgList" :key="item.id">
-          <img :src="item.url" alt />
-          <div class="imgbtn">
-            <el-button type="warning" icon="el-icon-star-off" circle size="mini"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
-          </div>
-        </li>
-      </ul>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-  </span>
-</el-dialog>
+    <el-dialog title="素材库" :visible.sync="dialogVisible" width="70%">
+      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane label="素材库" name="first">
+          <ul class="imglist">
+            <li class="imgbox" v-for="item in imgList" :key="item.id" @click="selectImg">
+              <img :src="item.url" alt />
+              <div class="imgbtn">
+                <el-button type="warning" icon="el-icon-star-off" circle size="mini"></el-button>
+                <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
+              </div>
+            </li>
+          </ul>
+        </el-tab-pane>
+        <el-tab-pane label="上传图片" name="second">
+          <el-button type="primary" size="small">上传图片</el-button>
+        </el-tab-pane>
+      </el-tabs>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -69,6 +72,7 @@ export default {
   },
   data () {
     return {
+      activeName: 'first',
       dialogVisible: false,
       articleForm: {
         title: '',
@@ -109,6 +113,14 @@ export default {
     this.getImgList()
   },
   methods: {
+    selectImg (event) {
+      var lis = document.getElementsByTagName('li')
+      for (var i = 0; i < lis.length; i++) {
+        lis[i].style.border = ''
+      }
+      let activeLi = event.target.parentNode
+      activeLi.style.border = '4px solid skyblue'
+    },
     showDialog () {
       this.dialogVisible = true
     },
@@ -171,12 +183,12 @@ export default {
     list-style: none;
     width: 200px;
     height: 200px;
-    border:1px solid #ccc;
+    border: 1px solid #ccc;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 0 20px;
-    span{
+    span {
       margin: 20px;
     }
   }
