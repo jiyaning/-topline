@@ -12,11 +12,34 @@
 
 <script>
 export default {
+  name: 'comment',
   data () {
     return {
-      commentList: {
-
-      }
+      commentForm: {
+        type: 'a',
+        source: [],
+        allow_comment: true
+      },
+      commentList: []
+    }
+  },
+  created () {
+    this.getcommentList()
+  },
+  methods: {
+    getcommentList () {
+      let pro = this.$http({
+        url: '/mp/v1_0/comments',
+        method: 'get',
+        params: this.commentForm
+      })
+      pro
+        .then(result => {
+          console.log(result)
+        })
+        .catch(err => {
+          this.$message.error('获取评论列表错误' + err)
+        })
     }
   }
 }

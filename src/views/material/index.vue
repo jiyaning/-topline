@@ -5,8 +5,8 @@
     </div>
     <div class="navmenu">
       <el-radio-group v-model="imgForm.collect">
-        <el-radio-button label="全部"></el-radio-button>
-        <el-radio-button label="收藏"></el-radio-button>
+        <el-radio-button :label="false">全部</el-radio-button>
+        <el-radio-button :label="true">收藏</el-radio-button>
       </el-radio-group>
       <el-upload
         class="upload-demo"
@@ -20,7 +20,7 @@
       </el-upload>
     </div>
     <div class="text item">
-      <p v-if="imgList.length===0">暂无图片素材</p>
+      <p v-if="total===0&&imgList.page===1">暂无图片素材</p>
       <ul class="imglist" v-else>
         <li class="imgbox" v-for="item in imgList" :key="item.id">
           <img :src="item.url" alt />
@@ -42,7 +42,6 @@
     :total="total"
     @current-change="handleCurrentChange"
     :current-page="imgForm.page"
-    :hide-on-single-page="valueFlag"
     ></el-pagination>
   </el-card>
 </template>
