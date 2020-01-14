@@ -39,6 +39,14 @@ export default {
         arr.push(key)
       }
       return arr
+    },
+    deviceVal () {
+      let device = this.fansInfoList.device
+      let arr = []
+      for (var key in device) {
+        arr.push({ value: device[key], name: key })
+      }
+      return arr
     }
 
   },
@@ -128,13 +136,7 @@ export default {
                 show: false
               }
             },
-            data: [
-              { value: 335, name: '直接访问' },
-              { value: 310, name: '邮件营销' },
-              { value: 234, name: '联盟广告' },
-              { value: 135, name: '视频广告' },
-              { value: 1548, name: '搜索引擎' }
-            ]
+            data: this.deviceVal
           }
         ]
       })
