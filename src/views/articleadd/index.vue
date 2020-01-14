@@ -18,9 +18,12 @@
           <el-radio :label="3">3张</el-radio>
         </el-radio-group>
         <ul class="uploadcon">
-          <li class="uploadbox" v-for="item in covernum" :key="item" @click="showDialog()">
-            <span>点击图标选择图片</span>
-            <i class="el-icon-picture-outline" style="font-size:90px"></i>
+          <li class="uploadbox" v-for="item in covernum" :key="item" @click="showDialog(item)">
+            <img v-if="articleForm.cover.images[item-1]" :src="articleForm.cover.images[item-1]" alt />
+            <div class="conbox" v-else>
+              <span>点击图标选择图片</span>
+              <i class="el-icon-picture-outline" style="font-size:90px"></i>
+            </div>
           </li>
         </ul>
       </el-form-item>
@@ -33,8 +36,8 @@
         <el-button @click="articleAdd(true)">存入草稿</el-button>
       </el-form-item>
     </el-form>
-    <el-dialog title="素材库" :visible.sync="dialogVisible" width="70%">
-      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+    <el-dialog title="素材库" :visible.sync="dialogVisible" width="70%" @close="clearImg">
+      <el-tabs v-model="activeName" type="card" >
         <el-tab-pane label="素材库" name="first">
           <ul class="imglist">
             <li class="imgbox" v-for="item in imgList" :key="item.id" @click="selectImg">
@@ -52,7 +55,7 @@
       </el-tabs>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="imgSave()">确 定</el-button>
       </span>
     </el-dialog>
   </el-card>
@@ -72,13 +75,16 @@ export default {
   },
   data () {
     return {
+      imgList: [],
       activeName: 'first',
       dialogVisible: false,
+      xu: '',
+      materialUrl: '',
       articleForm: {
         title: '',
         content: '',
         cover: {
-          type: 0,
+          type: 3,
           images: []
         },
         channel_id: ''
@@ -113,6 +119,21 @@ export default {
     this.getImgList()
   },
   methods: {
+    clearImg () {
+      var lis = document.getElementsByTagName('li')
+      for (var i = 0; i < lis.length; i++) {
+        lis[i].style.border = ''
+      }
+      this.materialUrl = ''
+    },
+    imgSave () {
+      if (this.materialUrl) {
+        this.articleForm.cover.images[this.xu] = this.materialUrl
+        this.dialogVisible = false
+      } else {
+        this.$message.error('请选择一张图片!')
+      }
+    },
     selectImg (event) {
       var lis = document.getElementsByTagName('li')
       for (var i = 0; i < lis.length; i++) {
@@ -120,8 +141,10 @@ export default {
       }
       let activeLi = event.target.parentNode
       activeLi.style.border = '4px solid skyblue'
+      this.materialUrl = event.target.src
     },
-    showDialog () {
+    showDialog (num) {
+      this.xu = num - 1
       this.dialogVisible = true
     },
     selectHander (val) {
@@ -132,6 +155,11 @@ export default {
         if (!valid) {
           return false
         }
+        if (this.articleForm.cover.type < 1) {
+          this.articleForm.cover.images.splice(0, 3)
+        } else {
+          this.articleForm.cover.images.splice(this.articleForm.cover.type, 3)
+        }
         let pro = this.$http({
           url: '/mp/v1_0/articles',
           method: 'post',
@@ -140,8 +168,11 @@ export default {
         })
         pro
           .then(result => {
-            console.log(result)
-            this.getchannelList()
+            this.$message({
+              type: 'success',
+              message: '发表成功!',
+              duration: 1000
+            })
             this.$router.push('/article')
           })
           .catch(err => {
@@ -178,18 +209,24 @@ export default {
 .uploadcon {
   display: flex;
   width: 100%;
-  // justify-content: space-around;
   .uploadbox {
     list-style: none;
-    width: 200px;
-    height: 200px;
     border: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    height: 200px;
     margin: 0 20px;
-    span {
-      margin: 20px;
+    .conbox {
+      width: 200px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      span {
+        margin: 20px;
+      }
+    }
+    img {
+      width: 200px;
+      height: 200px;
     }
   }
 }
